@@ -1,0 +1,57 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package myopencv;
+
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.WritableRaster;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+
+/**
+ *
+ * @author Oddy
+ */
+public class Mat2Image {
+
+    static {
+        System.loadLibrary("libopencv_java342");
+    }
+
+    Mat mat = new Mat();
+    BufferedImage img;
+
+    public Mat2Image() {
+    }
+
+    public Mat2Image(Mat mat) {
+        getSpace(mat);
+    }
+
+    public void getSpace(Mat mat) {
+        int type = 0;
+        if (mat.channels() == 1) {
+            type = BufferedImage.TYPE_BYTE_GRAY;
+        } else if (mat.channels() == 3) {
+            type = BufferedImage.TYPE_3BYTE_BGR;
+        }
+        this.mat = mat;
+        int w = mat.cols();
+        int h = mat.rows();
+        if (img == null || img.getWidth() != w || img.getHeight() != h || img.getType() != type) {
+            img = new BufferedImage(w, h, type);
+        }
+    }
+
+    BufferedImage getImage(Mat mat) {
+        getSpace(mat);
+        WritableRaster raster = img.getRaster();
+        DataBufferByte dataBuffer = (DataBufferByte) raster.getDataBuffer();
+        byte[] data = dataBuffer.getData();
+        mat.get(0, 0, data);
+        return img;
+    }
+}
